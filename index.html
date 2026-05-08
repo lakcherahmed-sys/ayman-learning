@@ -5,281 +5,333 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ayman 🚛 — Mon tableau d'apprentissage</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#FFF5EA;min-height:100vh;}
-  .app{max-width:800px;margin:0 auto;background:#FFF9F0;min-height:100vh;}
-  .topbar{background:#FF6B35;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
-  .topbar-title{font-size:22px;font-weight:700;color:#fff;}
-  .topbar-sub{font-size:12px;color:#FFD4C0;margin-top:2px;}
-  .progress-wrap{background:#FF8C5A;border-radius:8px;height:10px;width:130px;overflow:hidden;}
-  .progress-bar{height:100%;background:#fff;border-radius:8px;transition:width 0.4s;}
-  .nav{display:flex;gap:6px;padding:12px 16px;background:#fff;border-bottom:1px solid #EDE8E0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .nav-btn{border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
-  .nav-btn.active{background:#FF6B35;color:#fff;}
-  .nav-btn:not(.active){background:#F5F0E8;color:#633806;}
-  .content{padding:16px;}
-  .month-badge{display:inline-flex;align-items:center;gap:6px;background:#FAEEDA;color:#633806;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:14px;}
-  .section-head{font-size:16px;font-weight:700;color:#2C2C2A;margin:18px 0 10px;}
-  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
-  .learn-card{background:#fff;border:1.5px solid #EDE8E0;border-radius:14px;padding:14px 10px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;}
-  .learn-card:active{transform:scale(0.96);}
-  .learn-card.done{background:#EAF3DE;border-color:#639922;}
-  .learn-card .icon{font-size:36px;margin-bottom:8px;}
-  .learn-card .label{font-size:12px;font-weight:600;color:#2C2C2A;line-height:1.4;}
-  .learn-card .sub{font-size:11px;color:#888780;margin-top:4px;}
-  .learn-card .check{font-size:14px;color:#639922;margin-top:6px;font-weight:600;}
-  .quiz-area{background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:18px;}
-  .quiz-q{font-size:17px;font-weight:600;color:#2C2C2A;text-align:center;margin-bottom:16px;line-height:1.5;}
-  .quiz-icon{font-size:64px;text-align:center;margin-bottom:14px;}
-  .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-  .opt-btn{background:#F5F0E8;border:1.5px solid #EDE8E0;border-radius:12px;padding:12px 8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;color:#412402;-webkit-tap-highlight-color:transparent;}
-  .opt-btn:active{transform:scale(0.97);}
-  .opt-btn.correct{background:#EAF3DE;border-color:#639922;color:#27500A;}
-  .opt-btn.wrong{background:#FCEBEB;border-color:#E24B4A;color:#791F1F;}
-  .feedback{text-align:center;font-size:15px;font-weight:600;min-height:30px;margin-bottom:8px;}
-  .feedback.ok{color:#3B6D11;}
-  .feedback.ko{color:#A32D2D;}
-  .next-btn{display:block;width:100%;background:#FF6B35;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;}
-  .next-btn:active{background:#E55A25;}
-  .score-row{display:flex;gap:10px;margin-bottom:16px;}
-  .score-card{flex:1;border-radius:12px;padding:12px;text-align:center;}
-  .score-val{font-size:26px;font-weight:700;}
-  .score-lbl{font-size:11px;margin-top:2px;font-weight:500;}
-  .timeline{display:flex;flex-direction:column;gap:12px;}
-  .tl-item{display:flex;gap:14px;align-items:flex-start;}
-  .tl-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-  .tl-dot.done{background:#EAF3DE;}
-  .tl-dot.active{background:#FAEEDA;}
-  .tl-dot.future{background:#F5F0E8;}
-  .tl-body{flex:1;padding-top:4px;}
-  .tl-month{font-size:11px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:0.05em;}
-  .tl-title{font-size:14px;font-weight:600;color:#2C2C2A;margin-top:2px;}
-  .tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
-  .tag{font-size:10px;background:#E6F1FB;color:#0C447C;border-radius:10px;padding:3px 8px;font-weight:500;}
-  .sticker-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-  .sticker{font-size:32px;cursor:pointer;transition:transform 0.2s;-webkit-tap-highlight-color:transparent;}
-  .sticker:active{transform:scale(1.3);}
-  .hidden{display:none;}
-  .medal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .medal-card{border-radius:12px;padding:14px;text-align:center;}
-  .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
-  .info-box{background:#E6F1FB;border-radius:12px;padding:14px;margin-top:14px;}
-  .info-box-title{font-size:13px;font-weight:700;color:#0C447C;margin-bottom:4px;}
-  .info-box-body{font-size:12px;color:#185FA5;line-height:1.6;}
-  @media(max-width:480px){
-    .cards-grid{grid-template-columns:repeat(2,1fr);}
-    .topbar-title{font-size:18px;}
-  }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#FFF5EA;min-height:100vh;}
+.app{max-width:800px;margin:0 auto;background:#FFF9F0;min-height:100vh;}
+.topbar{background:#FF6B35;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-size:22px;font-weight:700;color:#fff;}
+.topbar-sub{font-size:12px;color:#FFD4C0;margin-top:2px;}
+.progress-wrap{background:#FF8C5A;border-radius:8px;height:10px;width:130px;overflow:hidden;}
+.progress-bar{height:100%;background:#fff;border-radius:8px;transition:width 0.4s;}
+.nav{display:flex;gap:6px;padding:10px 12px;background:#fff;border-bottom:1px solid #EDE8E0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.nav-btn{border:none;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.nav-btn.active{background:#FF6B35;color:#fff;}
+.nav-btn:not(.active){background:#F5F0E8;color:#633806;}
+.month-tabs{display:flex;gap:6px;padding:10px 16px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;}
+.month-tab{border:none;border-radius:10px 10px 0 0;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:#F5F0E8;color:#888780;border-bottom:2px solid transparent;}
+.month-tab.active{background:#FFF9F0;color:#FF6B35;border-bottom:2px solid #FF6B35;}
+.content{padding:16px;}
+.month-badge{display:inline-flex;align-items:center;gap:6px;background:#FAEEDA;color:#633806;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:14px;}
+.month-badge.current{background:#FF6B35;color:#fff;}
+.section-head{font-size:15px;font-weight:700;color:#2C2C2A;margin:16px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-done{font-size:11px;font-weight:500;color:#888780;margin-left:auto;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+.cards-grid.alpha{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));}
+.learn-card{background:#fff;border:1.5px solid #EDE8E0;border-radius:12px;padding:10px 8px;cursor:pointer;transition:all 0.18s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+.learn-card:active{transform:scale(0.95);}
+.learn-card.done{background:#EAF3DE;border-color:#639922;}
+.learn-card .icon{font-size:28px;margin-bottom:6px;}
+.learn-card.alpha-card .icon{font-size:22px;font-weight:700;color:#FF6B35;font-family:monospace;}
+.learn-card .label{font-size:11px;font-weight:600;color:#2C2C2A;line-height:1.3;}
+.learn-card .sub{font-size:10px;color:#888780;margin-top:3px;}
+.learn-card .check{font-size:12px;color:#639922;margin-top:4px;font-weight:700;}
+.quiz-area{background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:18px;}
+.quiz-q{font-size:17px;font-weight:600;color:#2C2C2A;text-align:center;margin-bottom:16px;line-height:1.5;}
+.quiz-icon{font-size:60px;text-align:center;margin-bottom:12px;}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.opt-btn{background:#F5F0E8;border:1.5px solid #EDE8E0;border-radius:12px;padding:12px 8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;color:#412402;-webkit-tap-highlight-color:transparent;}
+.opt-btn:active{transform:scale(0.97);}
+.opt-btn.correct{background:#EAF3DE;border-color:#639922;color:#27500A;}
+.opt-btn.wrong{background:#FCEBEB;border-color:#E24B4A;color:#791F1F;}
+.feedback{text-align:center;font-size:15px;font-weight:600;min-height:28px;margin-bottom:8px;}
+.feedback.ok{color:#3B6D11;}
+.feedback.ko{color:#A32D2D;}
+.next-btn{display:block;width:100%;background:#FF6B35;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;}
+.next-btn:active{background:#E55A25;}
+.score-row{display:flex;gap:10px;margin-bottom:14px;}
+.score-card{flex:1;border-radius:12px;padding:11px;text-align:center;}
+.score-val{font-size:24px;font-weight:700;}
+.score-lbl{font-size:10px;margin-top:2px;font-weight:500;}
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:0;align-items:stretch;}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:48px;flex-shrink:0;}
+.tl-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:4px;}
+.tl-dot.done{background:#EAF3DE;}
+.tl-dot.active{background:#FF6B35;}
+.tl-dot.future{background:#F5F0E8;}
+.tl-line{flex:1;width:2px;background:#EDE8E0;margin:4px 0;}
+.tl-body{flex:1;padding:4px 0 18px 14px;}
+.tl-month{font-size:10px;font-weight:700;color:#888780;text-transform:uppercase;letter-spacing:0.06em;}
+.tl-month.now{color:#FF6B35;}
+.tl-title{font-size:14px;font-weight:700;color:#2C2C2A;margin-top:2px;}
+.tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.tag{font-size:10px;border-radius:10px;padding:3px 8px;font-weight:500;}
+.tag-en{background:#E6F1FB;color:#0C447C;}
+.tag-ar{background:#FAEEDA;color:#633806;}
+.tag-fr{background:#EAF3DE;color:#27500A;}
+.sticker-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.sticker{font-size:30px;cursor:pointer;transition:transform 0.2s;-webkit-tap-highlight-color:transparent;}
+.sticker:active{transform:scale(1.3);}
+.hidden{display:none;}
+.medal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.medal-card{border-radius:12px;padding:12px;text-align:center;}
+.info-box{border-radius:12px;padding:14px;margin-top:12px;}
+.month-progress{height:6px;background:#EDE8E0;border-radius:6px;overflow:hidden;margin-top:6px;}
+.month-progress-bar{height:100%;background:#FF6B35;border-radius:6px;transition:width 0.4s;}
 </style>
 </head>
 <body>
-
-<div class="app" id="app">
+<div class="app">
 
   <div class="topbar">
     <div>
       <div class="topbar-title">Ayman 🚛</div>
-      <div class="topbar-sub">2 ans 1 mois → crèche septembre 2025</div>
+      <div class="topbar-sub">3 ans 1 mois → crèche septembre 2026</div>
     </div>
     <div style="text-align:right;">
-      <div style="font-size:11px;color:#FFD4C0;margin-bottom:5px;font-weight:500;">Progression</div>
-      <div class="progress-wrap">
-        <div class="progress-bar" id="global-bar" style="width:12%;"></div>
-      </div>
-      <div style="font-size:11px;color:#FFD4C0;margin-top:4px;font-weight:600;" id="global-pct">0%</div>
+      <div style="font-size:11px;color:#FFD4C0;margin-bottom:4px;font-weight:500;">Progression totale</div>
+      <div class="progress-wrap"><div class="progress-bar" id="global-bar" style="width:3%;"></div></div>
+      <div style="font-size:11px;color:#FFD4C0;margin-top:3px;font-weight:600;" id="global-pct">0%</div>
     </div>
   </div>
 
   <div class="nav">
     <button class="nav-btn active" onclick="showTab('learn')">📚 Apprendre</button>
     <button class="nav-btn" onclick="showTab('quiz')">🎯 Quiz</button>
-    <button class="nav-btn" onclick="showTab('plan')">📅 Plan</button>
+    <button class="nav-btn" onclick="showTab('plan')">📅 Programme</button>
     <button class="nav-btn" onclick="showTab('stars')">⭐ Étoiles</button>
   </div>
 
-  <div class="content">
+  <!-- TAB APPRENDRE -->
+  <div id="tab-learn">
+    <div class="month-tabs" id="month-tabs"></div>
+    <div class="content" id="learn-content"></div>
+  </div>
 
-    <!-- APPRENDRE -->
-    <div id="tab-learn">
-      <div class="month-badge">📅 Mai 2025 — 2 ans 1 mois</div>
+  <!-- TAB QUIZ -->
+  <div id="tab-quiz" class="hidden">
+    <div class="content">
       <div class="score-row">
-        <div class="score-card" style="background:#EEEDFE;">
-          <div class="score-val" style="color:#3C3489;" id="done-count">0</div>
-          <div class="score-lbl" style="color:#534AB7;">acquis</div>
-        </div>
-        <div class="score-card" style="background:#FAECE7;">
-          <div class="score-val" style="color:#712B13;" id="total-count">20</div>
-          <div class="score-lbl" style="color:#993C1D;">objectifs</div>
-        </div>
-        <div class="score-card" style="background:#E1F5EE;">
-          <div class="score-val" style="color:#085041;" id="pct-count">0%</div>
-          <div class="score-lbl" style="color:#0F6E56;">ce mois</div>
-        </div>
-      </div>
-
-      <div class="section-head">🐘 Animaux — English + عربي</div>
-      <div class="cards-grid" id="animals-grid"></div>
-
-      <div class="section-head">🚛 Camions & véhicules</div>
-      <div class="cards-grid" id="trucks-grid"></div>
-
-      <div class="section-head">🌈 Couleurs — 3 langues</div>
-      <div class="cards-grid" id="colors-grid"></div>
-
-      <div class="section-head">🗣️ Phrases du quotidien</div>
-      <div class="cards-grid" id="phrases-grid"></div>
-
-      <div class="section-head">🔢 Chiffres — English + عربي</div>
-      <div class="cards-grid" id="numbers-grid"></div>
-    </div>
-
-    <!-- QUIZ -->
-    <div id="tab-quiz" class="hidden">
-      <div class="score-row">
-        <div class="score-card" style="background:#EAF3DE;">
-          <div class="score-val" style="color:#27500A;" id="q-score">0</div>
-          <div class="score-lbl" style="color:#3B6D11;">bonnes réponses</div>
-        </div>
-        <div class="score-card" style="background:#FAEEDA;">
-          <div class="score-val" style="color:#633806;" id="q-total">0</div>
-          <div class="score-lbl" style="color:#854F0B;">questions jouées</div>
-        </div>
+        <div class="score-card" style="background:#EAF3DE;"><div class="score-val" style="color:#27500A;" id="q-score">0</div><div class="score-lbl" style="color:#3B6D11;">bonnes réponses</div></div>
+        <div class="score-card" style="background:#FAEEDA;"><div class="score-val" style="color:#633806;" id="q-total">0</div><div class="score-lbl" style="color:#854F0B;">questions jouées</div></div>
+        <div class="score-card" style="background:#EEEDFE;"><div class="score-val" style="color:#3C3489;" id="q-streak">0</div><div class="score-lbl" style="color:#534AB7;">série en cours</div></div>
       </div>
       <div class="quiz-area">
         <div class="quiz-icon" id="q-icon">🐘</div>
-        <div class="quiz-q" id="q-text">Loading...</div>
+        <div class="quiz-q" id="q-text">Chargement...</div>
         <div class="quiz-options" id="q-opts"></div>
         <div class="feedback" id="q-fb"></div>
-        <button class="next-btn" id="q-next" onclick="nextQuestion()">Question suivante ➜</button>
+        <button class="next-btn" onclick="nextQuestion()">Question suivante ➜</button>
       </div>
     </div>
+  </div>
 
-    <!-- PLAN -->
-    <div id="tab-plan" class="hidden">
-      <div style="font-size:15px;font-weight:700;color:#2C2C2A;margin-bottom:14px;">Programme Mai → Septembre 2025</div>
+  <!-- TAB PROGRAMME -->
+  <div id="tab-plan" class="hidden">
+    <div class="content">
+      <div style="font-size:15px;font-weight:700;color:#2C2C2A;margin-bottom:16px;">Programme Mai → Septembre 2026</div>
       <div class="timeline" id="timeline"></div>
-      <div class="info-box" style="margin-top:16px;">
-        <div class="info-box-title">💡 Conseil avant la crèche</div>
-        <div class="info-box-body">En août-septembre, pratiquez les routines : dire bonjour, au revoir, demander de l'aide, et exprimer ses besoins (faim, soif, pipi). Ces mots font toute la différence le premier jour !</div>
+      <div class="info-box" style="background:#E6F1FB;">
+        <div style="font-size:13px;font-weight:700;color:#0C447C;margin-bottom:4px;">💡 Conseil avant la crèche</div>
+        <div style="font-size:12px;color:#185FA5;line-height:1.6;">En août-septembre, pratiquez les routines : dire bonjour, au revoir, demander de l'aide, exprimer ses besoins. Ces mots font toute la différence le premier jour !</div>
       </div>
-      <div class="info-box" style="background:#EAF3DE;margin-top:10px;">
-        <div class="info-box-title" style="color:#27500A;">🚛 Astuces pour Ayman</div>
-        <div class="info-box-body" style="color:#3B6D11;">Utilisez ses camions préférés comme support : "The red fire truck / سيارة إطفاء حمراء". Jouez à nommer les couleurs des véhicules dans la rue — apprentissage naturel et amusant !</div>
+      <div class="info-box" style="background:#EAF3DE;">
+        <div style="font-size:13px;font-weight:700;color:#27500A;margin-bottom:4px;">🚛 Astuce pour Ayman</div>
+        <div style="font-size:12px;color:#3B6D11;line-height:1.6;">Utilisez ses camions pour apprendre : "The red fire truck / سيارة إطفاء حمراء". Nommez les couleurs et les véhicules dans la rue — apprentissage naturel et amusant !</div>
       </div>
     </div>
+  </div>
 
-    <!-- ÉTOILES -->
-    <div id="tab-stars" class="hidden">
-      <div style="text-align:center;padding:20px 0 16px;">
-        <div style="font-size:48px;margin-bottom:6px;">⭐</div>
+  <!-- TAB ÉTOILES -->
+  <div id="tab-stars" class="hidden">
+    <div class="content">
+      <div style="text-align:center;padding:16px 0 14px;">
+        <div style="font-size:44px;margin-bottom:4px;">⭐</div>
         <div style="font-size:28px;font-weight:700;color:#2C2C2A;" id="star-count">0 étoiles</div>
-        <div style="font-size:13px;color:#888780;margin-top:6px;">Chaque bonne réponse = 1 étoile !</div>
+        <div style="font-size:13px;color:#888780;margin-top:4px;">Chaque acquis ou bonne réponse = 1 étoile !</div>
       </div>
-
-      <div style="font-size:15px;font-weight:700;color:#2C2C2A;margin-bottom:12px;">Médailles</div>
-      <div class="medal-grid">
-        <div class="medal-card" style="background:#FAEEDA;">
-          <div style="font-size:28px;">🥉</div>
-          <div style="font-size:13px;color:#633806;font-weight:700;margin-top:4px;">5 étoiles</div>
-          <div style="font-size:11px;color:#854F0B;margin-top:2px;" id="medal-bronze">0 / 5</div>
-        </div>
-        <div class="medal-card" style="background:#F1EFE8;">
-          <div style="font-size:28px;">🥈</div>
-          <div style="font-size:13px;color:#444441;font-weight:700;margin-top:4px;">15 étoiles</div>
-          <div style="font-size:11px;color:#5F5E5A;margin-top:2px;" id="medal-silver">0 / 15</div>
-        </div>
-        <div class="medal-card" style="background:#FAEEDA;">
-          <div style="font-size:28px;">🥇</div>
-          <div style="font-size:13px;color:#633806;font-weight:700;margin-top:4px;">30 étoiles</div>
-          <div style="font-size:11px;color:#854F0B;margin-top:2px;" id="medal-gold">0 / 30</div>
-        </div>
-        <div class="medal-card" style="background:#EEEDFE;">
-          <div style="font-size:28px;">🏆</div>
-          <div style="font-size:13px;color:#3C3489;font-weight:700;margin-top:4px;">50 étoiles</div>
-          <div style="font-size:11px;color:#534AB7;margin-top:2px;" id="medal-trophy">0 / 50</div>
-        </div>
+      <div class="medal-grid" style="margin-bottom:14px;">
+        <div class="medal-card" style="background:#FAEEDA;"><div style="font-size:26px;">🥉</div><div style="font-size:12px;color:#633806;font-weight:700;margin-top:4px;">Bronze — 10 ⭐</div><div style="font-size:11px;color:#854F0B;" id="medal-bronze">0 / 10</div></div>
+        <div class="medal-card" style="background:#F1EFE8;"><div style="font-size:26px;">🥈</div><div style="font-size:12px;color:#444441;font-weight:700;margin-top:4px;">Argent — 25 ⭐</div><div style="font-size:11px;color:#5F5E5A;" id="medal-silver">0 / 25</div></div>
+        <div class="medal-card" style="background:#FAEEDA;"><div style="font-size:26px;">🥇</div><div style="font-size:12px;color:#633806;font-weight:700;margin-top:4px;">Or — 50 ⭐</div><div style="font-size:11px;color:#854F0B;" id="medal-gold">0 / 50</div></div>
+        <div class="medal-card" style="background:#EEEDFE;"><div style="font-size:26px;">🏆</div><div style="font-size:12px;color:#3C3489;font-weight:700;margin-top:4px;">Champion — 100 ⭐</div><div style="font-size:11px;color:#534AB7;" id="medal-trophy">0 / 100</div></div>
       </div>
-
-      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:16px;margin-top:16px;">
-        <div style="font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:10px;">Stickers d'Ayman</div>
+      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:#2C2C2A;margin-bottom:10px;">Stickers d'Ayman</div>
         <div class="sticker-row">
-          <span class="sticker">🐘</span>
-          <span class="sticker">🚛</span>
-          <span class="sticker">🦁</span>
-          <span class="sticker">🚜</span>
-          <span class="sticker">🦒</span>
-          <span class="sticker">🚒</span>
-          <span class="sticker">🐸</span>
-          <span class="sticker">🚑</span>
-          <span class="sticker">🐯</span>
-          <span class="sticker">🚌</span>
-          <span class="sticker">🦓</span>
-          <span class="sticker">🚂</span>
+          <span class="sticker">🐘</span><span class="sticker">🚛</span><span class="sticker">🦁</span>
+          <span class="sticker">🚜</span><span class="sticker">🦒</span><span class="sticker">🚒</span>
+          <span class="sticker">🐸</span><span class="sticker">🚑</span><span class="sticker">🐯</span>
+          <span class="sticker">🚌</span><span class="sticker">🦓</span><span class="sticker">🚂</span>
         </div>
       </div>
-
-      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:16px;margin-top:12px;">
-        <div style="font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:8px;">Suivi parents</div>
+      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#2C2C2A;margin-bottom:8px;">Journal des parents</div>
         <div id="log-list" style="font-size:12px;color:#888780;line-height:2;">Aucune session enregistrée.</div>
       </div>
     </div>
-
   </div>
+
 </div>
 
 <script>
-const animals=[
-  {icon:'🐘',label:'Elephant / فيل',done:false},
-  {icon:'🦁',label:'Lion / أسد',done:false},
-  {icon:'🐄',label:'Cow / بقرة',done:false},
-  {icon:'🐸',label:'Frog / ضفدع',done:false},
-  {icon:'🦒',label:'Giraffe / زرافة',done:false},
-  {icon:'🐟',label:'Fish / سمكة',done:false},
-  {icon:'🐯',label:'Tiger / نمر',done:false},
-  {icon:'🦓',label:'Zebra / حمار وحشي',done:false},
-];
-const trucks=[
-  {icon:'🚛',label:'Truck / شاحنة',done:false},
-  {icon:'🚜',label:'Tractor / جرار',done:false},
-  {icon:'🚒',label:'Fire truck / سيارة إطفاء',done:false},
-  {icon:'🚑',label:'Ambulance / إسعاف',done:false},
-  {icon:'🚌',label:'Bus / حافلة',done:false},
-  {icon:'🚂',label:'Train / قطار',done:false},
-];
-const colors=[
-  {icon:'🔴',label:'Red / أحمر / Rojo',done:false},
-  {icon:'🔵',label:'Blue / أزرق / Azul',done:false},
-  {icon:'🟢',label:'Green / أخضر / Verde',done:false},
-  {icon:'🟡',label:'Yellow / أصفر / Amarillo',done:false},
-  {icon:'🟠',label:'Orange / برتقالي / Naranja',done:false},
-  {icon:'🟣',label:'Purple / بنفسجي / Morado',done:false},
-];
-const phrases=[
-  {icon:'👋',label:'Hello / مرحبا / Hola',done:false},
-  {icon:'🙏',label:'Please / من فضلك / Por favor',done:false},
-  {icon:'😋',label:'I am hungry / أنا جائع',done:false},
-  {icon:'😴',label:'I am sleepy / أنا نعسان',done:false},
-  {icon:'💧',label:'I am thirsty / أنا عطشان',done:false},
-  {icon:'🚿',label:'Bathroom / الحمام',done:false},
-];
-const numbers=[
-  {icon:'1️⃣',label:'One / واحد / Uno',done:false},
-  {icon:'2️⃣',label:'Two / اثنان / Dos',done:false},
-  {icon:'3️⃣',label:'Three / ثلاثة / Tres',done:false},
-  {icon:'4️⃣',label:'Four / أربعة / Cuatro',done:false},
-  {icon:'5️⃣',label:'Five / خمسة / Cinco',done:false},
-  {icon:'6️⃣',label:'Six / ستة / Seis',done:false},
-  {icon:'7️⃣',label:'Seven / سبعة / Siete',done:false},
-  {icon:'8️⃣',label:'Eight / ثمانية / Ocho',done:false},
-  {icon:'9️⃣',label:'Nine / تسعة / Nueve',done:false},
-  {icon:'🔟',label:'Ten / عشرة / Diez',done:false},
+const MONTHS = [
+  {
+    id:'may', label:'Mai 2026', emoji:'🐘', status:'active',
+    tlTitle:'Animaux + couleurs de base',
+    tlTags:['elephant','lion','cow','frog','red','blue','green','yellow'],
+    sections:[
+      { head:'🐘 Animaux — English + عربي', id:'animals', alpha:false, items:[
+        {icon:'🐘',label:'Elephant\nفيل',done:false},
+        {icon:'🦁',label:'Lion\nأسد',done:false},
+        {icon:'🐄',label:'Cow\nبقرة',done:false},
+        {icon:'🐸',label:'Frog\nضفدع',done:false},
+        {icon:'🦒',label:'Giraffe\nزرافة',done:false},
+        {icon:'🐟',label:'Fish\nسمكة',done:false},
+        {icon:'🐯',label:'Tiger\nنمر',done:false},
+        {icon:'🦓',label:'Zebra\nحمار وحشي',done:false},
+        {icon:'🐧',label:'Penguin\nبطريق',done:false},
+        {icon:'🐬',label:'Dolphin\nدلفين',done:false},
+      ]},
+      { head:'🌈 Couleurs — 3 langues', id:'colors', alpha:false, items:[
+        {icon:'🔴',label:'Red / أحمر\nRojo',done:false},
+        {icon:'🔵',label:'Blue / أزرق\nAzul',done:false},
+        {icon:'🟢',label:'Green / أخضر\nVerde',done:false},
+        {icon:'🟡',label:'Yellow / أصفر\nAmarillo',done:false},
+        {icon:'🟠',label:'Orange / برتقالي\nNaranja',done:false},
+        {icon:'🟣',label:'Purple / بنفسجي\nMorado',done:false},
+        {icon:'⚫',label:'Black / أسود\nNegro',done:false},
+        {icon:'⚪',label:'White / أبيض\nBlanco',done:false},
+      ]},
+    ]
+  },
+  {
+    id:'jun', label:'Juin 2026', emoji:'🚛', status:'future',
+    tlTitle:'Camions, véhicules & chiffres 1-10',
+    tlTags:['truck','tractor','fire truck','ambulance','1 to 10'],
+    sections:[
+      { head:'🚛 Camions & véhicules', id:'trucks', alpha:false, items:[
+        {icon:'🚛',label:'Truck\nشاحنة',done:false},
+        {icon:'🚜',label:'Tractor\nجرار',done:false},
+        {icon:'🚒',label:'Fire truck\nسيارة إطفاء',done:false},
+        {icon:'🚑',label:'Ambulance\nإسعاف',done:false},
+        {icon:'🚌',label:'Bus\nحافلة',done:false},
+        {icon:'🚂',label:'Train\nقطار',done:false},
+        {icon:'✈️',label:'Airplane\nطائرة',done:false},
+        {icon:'🚁',label:'Helicopter\nمروحية',done:false},
+        {icon:'🚢',label:'Ship\nسفينة',done:false},
+        {icon:'🚗',label:'Car\nسيارة',done:false},
+      ]},
+      { head:'🔢 Chiffres 1 → 10', id:'num1', alpha:false, items:[
+        {icon:'1️⃣',label:'One\nواحد / Uno',done:false},
+        {icon:'2️⃣',label:'Two\nاثنان / Dos',done:false},
+        {icon:'3️⃣',label:'Three\nثلاثة / Tres',done:false},
+        {icon:'4️⃣',label:'Four\nأربعة / Cuatro',done:false},
+        {icon:'5️⃣',label:'Five\nخمسة / Cinco',done:false},
+        {icon:'6️⃣',label:'Six\nستة / Seis',done:false},
+        {icon:'7️⃣',label:'Seven\nسبعة / Siete',done:false},
+        {icon:'8️⃣',label:'Eight\nثمانية / Ocho',done:false},
+        {icon:'9️⃣',label:'Nine\nتسعة / Nueve',done:false},
+        {icon:'🔟',label:'Ten\nعشرة / Diez',done:false},
+      ]},
+    ]
+  },
+  {
+    id:'jul', label:'Juil 2026', emoji:'🔤', status:'future',
+    tlTitle:'Alphabet A→Z + chiffres 11-20',
+    tlTags:['A to Z','11 to 20','formes','grand/petit'],
+    sections:[
+      { head:'🔤 Alphabet A → Z', id:'alpha', alpha:true, items:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l=>({icon:l,label:l+' for '+alphaWord(l),done:false}))},
+      { head:'🔢 Chiffres 11 → 20', id:'num2', alpha:false, items:[
+        {icon:'🔢',label:'11\nEleven / أحد عشر',done:false},
+        {icon:'🔢',label:'12\nTwelve / اثنا عشر',done:false},
+        {icon:'🔢',label:'13\nThirteen / ثلاثة عشر',done:false},
+        {icon:'🔢',label:'14\nFourteen / أربعة عشر',done:false},
+        {icon:'🔢',label:'15\nFifteen / خمسة عشر',done:false},
+        {icon:'🔢',label:'16\nSixteen / ستة عشر',done:false},
+        {icon:'🔢',label:'17\nSeventeen / سبعة عشر',done:false},
+        {icon:'🔢',label:'18\nEighteen / ثمانية عشر',done:false},
+        {icon:'🔢',label:'19\nNineteen / تسعة عشر',done:false},
+        {icon:'🔢',label:'20\nTwenty / عشرون',done:false},
+      ]},
+      { head:'🔷 Formes géométriques', id:'shapes', alpha:false, items:[
+        {icon:'🔵',label:'Circle\nدائرة / Círculo',done:false},
+        {icon:'🟥',label:'Square\nمربع / Cuadrado',done:false},
+        {icon:'🔺',label:'Triangle\nمثلث / Triángulo',done:false},
+        {icon:'🟦',label:'Rectangle\nمستطيل / Rectángulo',done:false},
+        {icon:'⭐',label:'Star\nنجمة / Estrella',done:false},
+        {icon:'💎',label:'Diamond\nمعين / Diamante',done:false},
+      ]},
+    ]
+  },
+  {
+    id:'aug', label:'Août 2026', emoji:'🗣️', status:'future',
+    tlTitle:'Phrases du quotidien + corps humain',
+    tlTags:['hello','please','hungry','thirsty','body parts'],
+    sections:[
+      { head:'🗣️ Phrases du quotidien', id:'phrases', alpha:false, items:[
+        {icon:'👋',label:'Hello / مرحبا\nHola',done:false},
+        {icon:'🙏',label:'Please\nمن فضلك',done:false},
+        {icon:'😋',label:'I\'m hungry\nأنا جائع',done:false},
+        {icon:'😴',label:'I\'m sleepy\nأنا نعسان',done:false},
+        {icon:'💧',label:'I\'m thirsty\nأنا عطشان',done:false},
+        {icon:'🚿',label:'Bathroom\nالحمام',done:false},
+        {icon:'😢',label:'I\'m sad\nأنا حزين',done:false},
+        {icon:'😊',label:'I\'m happy\nأنا سعيد',done:false},
+        {icon:'🤕',label:'I\'m hurt\nأنا مؤلم',done:false},
+        {icon:'🤝',label:'Thank you\nشكرا / Gracias',done:false},
+      ]},
+      { head:'🧍 Corps humain', id:'body', alpha:false, items:[
+        {icon:'👁️',label:'Eye / عين\nOjo',done:false},
+        {icon:'👃',label:'Nose / أنف\nNariz',done:false},
+        {icon:'👄',label:'Mouth / فم\nBoca',done:false},
+        {icon:'👂',label:'Ear / أذن\nOreja',done:false},
+        {icon:'🦷',label:'Teeth / أسنان\nDientes',done:false},
+        {icon:'✋',label:'Hand / يد\nMano',done:false},
+        {icon:'🦶',label:'Foot / قدم\nPie',done:false},
+        {icon:'🫀',label:'Heart / قلب\nCorazón',done:false},
+      ]},
+    ]
+  },
+  {
+    id:'sep', label:'Sept 2026', emoji:'🎒', status:'future',
+    tlTitle:'Prêt pour la crèche !',
+    tlTags:['bonjour','au revoir','mon nom','j\'ai besoin d\'aide','merci'],
+    sections:[
+      { head:'🎒 Routine crèche — français', id:'creche', alpha:false, items:[
+        {icon:'🌅',label:'Bonjour !\nGood morning',done:false},
+        {icon:'🌙',label:'Au revoir !\nGoodbye',done:false},
+        {icon:'🪪',label:'Je m\'appelle Ayman\nMy name is Ayman',done:false},
+        {icon:'🆘',label:'J\'ai besoin d\'aide\nI need help',done:false},
+        {icon:'🙏',label:'Merci / Thank you\nShukran',done:false},
+        {icon:'🚽',label:'J\'ai envie de faire pipi\nI need the bathroom',done:false},
+        {icon:'🍎',label:'J\'ai faim / I\'m hungry\nأنا جائع',done:false},
+        {icon:'👫',label:'C\'est mon ami(e)\nThis is my friend',done:false},
+        {icon:'😢',label:'Je veux maman / papa\nI want mum/dad',done:false},
+        {icon:'🎈',label:'Je veux jouer\nI want to play',done:false},
+      ]},
+      { head:'🔁 Révision globale', id:'revision', alpha:false, items:[
+        {icon:'🌈',label:'8 couleurs ✓\nAll colors',done:false},
+        {icon:'🔢',label:'1 → 20 ✓\nAll numbers',done:false},
+        {icon:'🔤',label:'A → Z ✓\nFull alphabet',done:false},
+        {icon:'🐘',label:'10 animaux ✓\nAll animals',done:false},
+        {icon:'🚛',label:'10 véhicules ✓\nAll vehicles',done:false},
+        {icon:'🗣️',label:'10 phrases ✓\nDaily phrases',done:false},
+      ]},
+    ]
+  },
 ];
 
-const quizData=[
-  {icon:'🐘',q:'What is this animal?',opts:['Elephant','Lion','Cow','Giraffe'],ans:'Elephant'},
+function alphaWord(l){
+  const map={A:'Apple',B:'Ball',C:'Cat',D:'Dog',E:'Elephant',F:'Fish',G:'Giraffe',H:'Hat',I:'Ice cream',J:'Juice',K:'Kite',L:'Lion',M:'Monkey',N:'Nest',O:'Orange',P:'Penguin',Q:'Queen',R:'Rabbit',S:'Sun',T:'Truck',U:'Umbrella',V:'Van',W:'Whale',X:'Xylophone',Y:'Yellow',Z:'Zebra'};
+  return map[l]||l;
+}
+
+const quizAll=[
+  {icon:'🐘',q:'What animal is this?',opts:['Elephant','Lion','Cow','Giraffe'],ans:'Elephant'},
   {icon:'🚛',q:'What vehicle is this?',opts:['Bus','Train','Truck','Car'],ans:'Truck'},
   {icon:'🔴',q:'What color is this? 🔴',opts:['Blue','Red','Green','Yellow'],ans:'Red'},
-  {icon:'🦁',q:'This animal says ROAR! It\'s a...',opts:['Elephant','Giraffe','Lion','Frog'],ans:'Lion'},
+  {icon:'🦁',q:'This animal says ROAR!',opts:['Elephant','Giraffe','Lion','Frog'],ans:'Lion'},
   {icon:'🚒',q:'This red truck helps in fires!',opts:['Ambulance','Tractor','Fire truck','Bus'],ans:'Fire truck'},
   {icon:'🟡',q:'What color is the sun? 🌞',opts:['Red','Blue','Yellow','Green'],ans:'Yellow'},
   {icon:'🐸',q:'This small green animal jumps!',opts:['Fish','Cow','Giraffe','Frog'],ans:'Frog'},
@@ -288,142 +340,177 @@ const quizData=[
   {icon:'🔵',q:'What color is the sea? 🌊',opts:['Red','Yellow','Green','Blue'],ans:'Blue'},
   {icon:'🚑',q:'This white truck helps sick people!',opts:['Bus','Fire truck','Ambulance','Tractor'],ans:'Ambulance'},
   {icon:'🟢',q:'What color is grass? 🌿',opts:['Red','Yellow','Green','Blue'],ans:'Green'},
-  {icon:'🐯',q:'This striped animal is a...',opts:['Lion','Zebra','Tiger','Cow'],ans:'Tiger'},
+  {icon:'🐯',q:'This striped orange animal is a...',opts:['Lion','Zebra','Tiger','Cow'],ans:'Tiger'},
   {icon:'🦓',q:'Black and white stripes — it\'s a...',opts:['Tiger','Zebra','Horse','Giraffe'],ans:'Zebra'},
-  {icon:'🚌',q:'This vehicle carries many people!',opts:['Truck','Bus','Train','Tractor'],ans:'Bus'},
+  {icon:'🚌',q:'This big vehicle carries many people!',opts:['Truck','Bus','Train','Tractor'],ans:'Bus'},
+  {icon:'3️⃣',q:'What number is this? 3️⃣',opts:['Two','Four','Three','Five'],ans:'Three'},
+  {icon:'7️⃣',q:'What number is this? 7️⃣',opts:['Six','Eight','Nine','Seven'],ans:'Seven'},
+  {icon:'🔺',q:'This shape has 3 sides — it\'s a...',opts:['Circle','Square','Triangle','Rectangle'],ans:'Triangle'},
+  {icon:'🔵',q:'This round shape is a...',opts:['Triangle','Square','Circle','Star'],ans:'Circle'},
+  {icon:'A',q:'Which letter is this? A',opts:['B','A','C','D'],ans:'A'},
+  {icon:'T',q:'T is for...',opts:['Tiger','Truck','Train','All of these!'],ans:'All of these!'},
+  {icon:'🐬',q:'This smart sea animal is a...',opts:['Fish','Shark','Dolphin','Whale'],ans:'Dolphin'},
+  {icon:'✈️',q:'This vehicle flies in the sky!',opts:['Helicopter','Airplane','Rocket','Bus'],ans:'Airplane'},
 ];
 
-const plan=[
-  {month:'Mai 2025',icon:'🐘',status:'active',title:'Animaux + couleurs de base',tags:['elephant','lion','cow','frog','red','blue','green','yellow']},
-  {month:'Juin 2025',icon:'🚛',status:'future',title:'Camions & véhicules',tags:['truck','tractor','fire truck','ambulance','bus','train']},
-  {month:'Juillet 2025',icon:'🗣️',status:'future',title:'Phrases du quotidien',tags:['hello','please','I want...','hungry','thirsty','bathroom']},
-  {month:'Août 2025',icon:'🔢',status:'future',title:'Chiffres 1-10 + formes',tags:['one→ten','circle','square','triangle','big/small']},
-  {month:'Septembre 2025',icon:'🎒',status:'future',title:'Prêt pour la crèche !',tags:['bonjour','au revoir','mon nom est...','j\'ai besoin d\'aide','merci']},
-];
-
-let stars=0;
-let qIdx=0;
-let qScore=0;
-let qTotal=0;
-let answered=false;
+let stars=0, qIdx=0, qScore=0, qTotal=0, qStreak=0, answered=false;
+let currentMonth='may';
 let sessionLog=[];
 
 function saveState(){
-  const state={animals,trucks,colors,phrases,numbers,stars,qScore,qTotal};
-  try{localStorage.setItem('ayman_state',JSON.stringify(state));}catch(e){}
+  const flat={};
+  MONTHS.forEach(m=>m.sections.forEach(s=>s.items.forEach((item,i)=>{flat[m.id+'_'+s.id+'_'+i]=item.done;})));
+  try{localStorage.setItem('ayman26_items',JSON.stringify(flat));
+  localStorage.setItem('ayman26_stars',stars);
+  localStorage.setItem('ayman26_qscore',qScore);
+  localStorage.setItem('ayman26_qtotal',qTotal);}catch(e){}
 }
 
 function loadState(){
   try{
-    const s=localStorage.getItem('ayman_state');
-    if(!s) return;
-    const d=JSON.parse(s);
-    if(d.animals) d.animals.forEach((x,i)=>{if(animals[i]) animals[i].done=x.done;});
-    if(d.trucks) d.trucks.forEach((x,i)=>{if(trucks[i]) trucks[i].done=x.done;});
-    if(d.colors) d.colors.forEach((x,i)=>{if(colors[i]) colors[i].done=x.done;});
-    if(d.phrases) d.phrases.forEach((x,i)=>{if(phrases[i]) phrases[i].done=x.done;});
-    if(d.numbers) d.numbers.forEach((x,i)=>{if(numbers[i]) numbers[i].done=x.done;});
-    if(d.stars) stars=d.stars;
-    if(d.qScore) qScore=d.qScore;
-    if(d.qTotal) qTotal=d.qTotal;
+    const flat=JSON.parse(localStorage.getItem('ayman26_items')||'{}');
+    MONTHS.forEach(m=>m.sections.forEach(s=>s.items.forEach((item,i)=>{
+      const k=m.id+'_'+s.id+'_'+i;
+      if(flat[k]!==undefined) item.done=flat[k];
+    })));
+    stars=parseInt(localStorage.getItem('ayman26_stars')||'0');
+    qScore=parseInt(localStorage.getItem('ayman26_qscore')||'0');
+    qTotal=parseInt(localStorage.getItem('ayman26_qtotal')||'0');
   }catch(e){}
 }
 
-function renderGrid(items,containerId){
-  const g=document.getElementById(containerId);
-  if(!g) return;
-  g.innerHTML='';
-  items.forEach((item)=>{
-    const d=document.createElement('div');
-    d.className='learn-card'+(item.done?' done':'');
-    d.innerHTML='<div class="icon">'+item.icon+'</div><div class="label">'+item.label+'</div>'+(item.done?'<div class="check">✓ Acquis !</div>':'<div class="sub">Appuyer pour valider</div>');
-    d.onclick=()=>{
-      item.done=!item.done;
-      if(item.done){
-        stars++;
-        logSession(item.label);
-      } else {
-        if(stars>0) stars--;
-      }
-      updateStars();
-      renderGrid(items,containerId);
-      updateProgress();
-      saveState();
-      if(item.done) animateStar(d);
-    };
-    g.appendChild(d);
+function renderMonthTabs(){
+  const c=document.getElementById('month-tabs');
+  c.innerHTML='';
+  MONTHS.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='month-tab'+(m.id===currentMonth?' active':'');
+    b.textContent=m.emoji+' '+m.label;
+    b.onclick=()=>{currentMonth=m.id;renderMonthTabs();renderLearnContent();};
+    c.appendChild(b);
   });
 }
 
-function animateStar(el){
-  const s=document.createElement('div');
-  s.textContent='⭐';
-  s.style.cssText='position:absolute;font-size:24px;pointer-events:none;z-index:100;transition:all 0.6s;';
-  const r=el.getBoundingClientRect();
-  s.style.left=(r.left+r.width/2)+'px';
-  s.style.top=(r.top)+'px';
-  document.body.appendChild(s);
-  setTimeout(()=>{s.style.transform='translateY(-60px)';s.style.opacity='0';},50);
-  setTimeout(()=>{if(s.parentNode) s.parentNode.removeChild(s);},700);
-}
+function renderLearnContent(){
+  const month=MONTHS.find(m=>m.id===currentMonth);
+  const c=document.getElementById('learn-content');
+  c.innerHTML='';
 
-function logSession(label){
-  const now=new Date();
-  const time=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  sessionLog.unshift(time+' — ✅ '+label);
-  if(sessionLog.length>10) sessionLog.pop();
-  const el=document.getElementById('log-list');
-  if(el) el.innerHTML=sessionLog.map(l=>'<div>'+l+'</div>').join('');
+  const badge=document.createElement('div');
+  badge.className='month-badge'+(month.status==='active'?' current':'');
+  badge.textContent=(month.status==='active'?'📅 Mois en cours — ':'📅 ')+month.label;
+  c.appendChild(badge);
+
+  const allItems=month.sections.flatMap(s=>s.items);
+  const doneCount=allItems.filter(x=>x.done).length;
+  const pct=allItems.length?Math.round(doneCount/allItems.length*100):0;
+
+  const stats=document.createElement('div');
+  stats.className='score-row';
+  stats.innerHTML=`
+    <div class="score-card" style="background:#EEEDFE;"><div class="score-val" style="color:#3C3489;">${doneCount}</div><div class="score-lbl" style="color:#534AB7;">acquis</div></div>
+    <div class="score-card" style="background:#FAECE7;"><div class="score-val" style="color:#712B13;">${allItems.length}</div><div class="score-lbl" style="color:#993C1D;">objectifs</div></div>
+    <div class="score-card" style="background:#E1F5EE;"><div class="score-val" style="color:#085041;">${pct}%</div><div class="score-lbl" style="color:#0F6E56;">ce mois</div></div>`;
+  c.appendChild(stats);
+
+  const progWrap=document.createElement('div');
+  progWrap.className='month-progress';
+  progWrap.style.marginBottom='16px';
+  const progBar=document.createElement('div');
+  progBar.className='month-progress-bar';
+  progBar.style.width=Math.max(2,pct)+'%';
+  progWrap.appendChild(progBar);
+  c.appendChild(progWrap);
+
+  month.sections.forEach(sec=>{
+    const secDone=sec.items.filter(x=>x.done).length;
+    const headDiv=document.createElement('div');
+    headDiv.className='section-head';
+    headDiv.innerHTML=sec.head+'<span class="section-done">'+secDone+'/'+sec.items.length+'</span>';
+    c.appendChild(headDiv);
+
+    const grid=document.createElement('div');
+    grid.className='cards-grid'+(sec.alpha?' alpha':'');
+
+    sec.items.forEach((item,i)=>{
+      const d=document.createElement('div');
+      d.className='learn-card'+(sec.alpha?' alpha-card':'')+(item.done?' done':'');
+      if(sec.alpha){
+        d.innerHTML='<div class="icon">'+item.icon+'</div><div class="label" style="font-size:9px;line-height:1.2;">'+item.label.split('\n').join('<br>')+'</div>'+(item.done?'<div class="check">✓</div>':'');
+      } else {
+        d.innerHTML='<div class="icon">'+item.icon+'</div><div class="label">'+item.label.split('\n').join('<br>')+'</div>'+(item.done?'<div class="check">✓ Acquis !</div>':'<div class="sub">Appuyer pour valider</div>');
+      }
+      d.onclick=()=>{
+        item.done=!item.done;
+        if(item.done){stars++;logSession(item.icon+' '+item.label.split('\n')[0]);}
+        else if(stars>0) stars--;
+        updateStars();
+        updateProgress();
+        renderLearnContent();
+        saveState();
+      };
+      grid.appendChild(d);
+    });
+    c.appendChild(grid);
+  });
 }
 
 function updateProgress(){
-  const all=[...animals,...trucks,...colors,...phrases,...numbers];
+  const all=MONTHS.flatMap(m=>m.sections.flatMap(s=>s.items));
   const done=all.filter(x=>x.done).length;
-  const total=all.length;
-  document.getElementById('done-count').textContent=done;
-  document.getElementById('total-count').textContent=total;
-  const pct=Math.round(done/total*100);
-  document.getElementById('pct-count').textContent=pct+'%';
-  document.getElementById('global-bar').style.width=Math.max(3,pct)+'%';
+  const pct=Math.round(done/all.length*100);
+  document.getElementById('global-bar').style.width=Math.max(2,pct)+'%';
   document.getElementById('global-pct').textContent=pct+'%';
 }
 
 function updateStars(){
   const sc=document.getElementById('star-count');
   if(sc) sc.textContent=stars+' étoile'+(stars!==1?'s':'');
-  const qs=document.getElementById('q-score');
-  if(qs) qs.textContent=qScore;
-  const qt=document.getElementById('q-total');
-  if(qt) qt.textContent=qTotal;
-  const targets=[5,15,30,50];
+  document.getElementById('q-score').textContent=qScore;
+  document.getElementById('q-total').textContent=qTotal;
+  document.getElementById('q-streak').textContent=qStreak;
+  const targets=[10,25,50,100];
   ['bronze','silver','gold','trophy'].forEach((m,i)=>{
     const el=document.getElementById('medal-'+m);
     if(el) el.textContent=Math.min(stars,targets[i])+' / '+targets[i];
   });
 }
 
+function logSession(label){
+  const now=new Date();
+  const time=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  sessionLog.unshift(time+' — ✅ '+label);
+  if(sessionLog.length>15) sessionLog.pop();
+  const el=document.getElementById('log-list');
+  if(el) el.innerHTML=sessionLog.map(l=>'<div>'+l+'</div>').join('');
+}
+
 function renderTimeline(){
   const tl=document.getElementById('timeline');
   if(!tl) return;
   tl.innerHTML='';
-  plan.forEach(p=>{
+  MONTHS.forEach((m,idx)=>{
+    const isLast=idx===MONTHS.length-1;
     const div=document.createElement('div');
     div.className='tl-item';
-    div.innerHTML='<div class="tl-dot '+p.status+'">'+p.icon+'</div><div class="tl-body"><div class="tl-month">'+p.month+(p.status==='active'?' — EN COURS ✨':'')+'</div><div class="tl-title">'+p.title+'</div><div class="tl-tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div></div>';
+    div.innerHTML=`
+      <div class="tl-left">
+        <div class="tl-dot ${m.status}" style="${m.status==='active'?'color:#fff;font-size:18px;':''}">${m.emoji}</div>
+        ${!isLast?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="tl-body">
+        <div class="tl-month ${m.status==='active'?'now':''}">${m.label}${m.status==='active'?' — EN COURS ✨':''}</div>
+        <div class="tl-title">${m.tlTitle}</div>
+        <div class="tl-tags">${m.tlTags.map(t=>'<span class="tag tag-en">'+t+'</span>').join('')}</div>
+      </div>`;
     tl.appendChild(div);
   });
 }
 
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function renderQuiz(){
-  const q=quizData[qIdx%quizData.length];
+  const q=quizAll[qIdx%quizAll.length];
   document.getElementById('q-icon').textContent=q.icon;
   document.getElementById('q-text').textContent=q.q;
   document.getElementById('q-fb').textContent='';
@@ -446,34 +533,34 @@ function checkAnswer(chosen,correct){
   if(answered) return;
   answered=true;
   qTotal++;
-  const btns=document.querySelectorAll('.opt-btn');
-  btns.forEach(b=>{
+  document.querySelectorAll('.opt-btn').forEach(b=>{
     if(b.textContent===correct) b.className='opt-btn correct';
-    else if(b.textContent===chosen && chosen!==correct) b.className='opt-btn wrong';
+    else if(b.textContent===chosen&&chosen!==correct) b.className='opt-btn wrong';
   });
   const fb=document.getElementById('q-fb');
   if(chosen===correct){
-    qScore++;
-    stars++;
-    fb.textContent='Bravo Ayman ! Correct ! ⭐';
+    qScore++;stars++;qStreak++;
+    fb.textContent='Bravo Ayman ! ⭐ Série : '+qStreak;
     fb.className='feedback ok';
-    updateStars();
-    saveState();
   } else {
-    fb.textContent='Presque ! La bonne réponse : '+correct+' 💪';
+    qStreak=0;
+    fb.textContent='Presque ! Bonne réponse : '+correct+' 💪';
     fb.className='feedback ko';
   }
+  updateStars();
+  saveState();
 }
 
 function nextQuestion(){
-  qIdx=(qIdx+1)%quizData.length;
-  if(qIdx===0) shuffle(quizData);
+  qIdx=(qIdx+1)%quizAll.length;
+  if(qIdx===0) shuffle(quizAll);
   renderQuiz();
 }
 
 function showTab(name){
   ['learn','quiz','plan','stars'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.add('hidden');
+    const el=document.getElementById('tab-'+t);
+    if(el) el.classList.add('hidden');
   });
   document.getElementById('tab-'+name).classList.remove('hidden');
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
@@ -483,13 +570,10 @@ function showTab(name){
 }
 
 loadState();
-renderGrid(animals,'animals-grid');
-renderGrid(trucks,'trucks-grid');
-renderGrid(colors,'colors-grid');
-renderGrid(phrases,'phrases-grid');
-renderGrid(numbers,'numbers-grid');
+renderMonthTabs();
+renderLearnContent();
 renderTimeline();
-shuffle(quizData);
+shuffle(quizAll);
 renderQuiz();
 updateProgress();
 updateStars();
