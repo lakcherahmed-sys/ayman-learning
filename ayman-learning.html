@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ayman 🚛 — Mon tableau d'apprentissage</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#FFF5EA;min-height:100vh;}
+  .app{max-width:800px;margin:0 auto;background:#FFF9F0;min-height:100vh;}
+  .topbar{background:#FF6B35;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .topbar-title{font-size:22px;font-weight:700;color:#fff;}
+  .topbar-sub{font-size:12px;color:#FFD4C0;margin-top:2px;}
+  .progress-wrap{background:#FF8C5A;border-radius:8px;height:10px;width:130px;overflow:hidden;}
+  .progress-bar{height:100%;background:#fff;border-radius:8px;transition:width 0.4s;}
+  .nav{display:flex;gap:6px;padding:12px 16px;background:#fff;border-bottom:1px solid #EDE8E0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .nav-btn{border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+  .nav-btn.active{background:#FF6B35;color:#fff;}
+  .nav-btn:not(.active){background:#F5F0E8;color:#633806;}
+  .content{padding:16px;}
+  .month-badge{display:inline-flex;align-items:center;gap:6px;background:#FAEEDA;color:#633806;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:14px;}
+  .section-head{font-size:16px;font-weight:700;color:#2C2C2A;margin:18px 0 10px;}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+  .learn-card{background:#fff;border:1.5px solid #EDE8E0;border-radius:14px;padding:14px 10px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+  .learn-card:active{transform:scale(0.96);}
+  .learn-card.done{background:#EAF3DE;border-color:#639922;}
+  .learn-card .icon{font-size:36px;margin-bottom:8px;}
+  .learn-card .label{font-size:12px;font-weight:600;color:#2C2C2A;line-height:1.4;}
+  .learn-card .sub{font-size:11px;color:#888780;margin-top:4px;}
+  .learn-card .check{font-size:14px;color:#639922;margin-top:6px;font-weight:600;}
+  .quiz-area{background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:18px;}
+  .quiz-q{font-size:17px;font-weight:600;color:#2C2C2A;text-align:center;margin-bottom:16px;line-height:1.5;}
+  .quiz-icon{font-size:64px;text-align:center;margin-bottom:14px;}
+  .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .opt-btn{background:#F5F0E8;border:1.5px solid #EDE8E0;border-radius:12px;padding:12px 8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;color:#412402;-webkit-tap-highlight-color:transparent;}
+  .opt-btn:active{transform:scale(0.97);}
+  .opt-btn.correct{background:#EAF3DE;border-color:#639922;color:#27500A;}
+  .opt-btn.wrong{background:#FCEBEB;border-color:#E24B4A;color:#791F1F;}
+  .feedback{text-align:center;font-size:15px;font-weight:600;min-height:30px;margin-bottom:8px;}
+  .feedback.ok{color:#3B6D11;}
+  .feedback.ko{color:#A32D2D;}
+  .next-btn{display:block;width:100%;background:#FF6B35;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;}
+  .next-btn:active{background:#E55A25;}
+  .score-row{display:flex;gap:10px;margin-bottom:16px;}
+  .score-card{flex:1;border-radius:12px;padding:12px;text-align:center;}
+  .score-val{font-size:26px;font-weight:700;}
+  .score-lbl{font-size:11px;margin-top:2px;font-weight:500;}
+  .timeline{display:flex;flex-direction:column;gap:12px;}
+  .tl-item{display:flex;gap:14px;align-items:flex-start;}
+  .tl-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .tl-dot.done{background:#EAF3DE;}
+  .tl-dot.active{background:#FAEEDA;}
+  .tl-dot.future{background:#F5F0E8;}
+  .tl-body{flex:1;padding-top:4px;}
+  .tl-month{font-size:11px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:0.05em;}
+  .tl-title{font-size:14px;font-weight:600;color:#2C2C2A;margin-top:2px;}
+  .tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .tag{font-size:10px;background:#E6F1FB;color:#0C447C;border-radius:10px;padding:3px 8px;font-weight:500;}
+  .sticker-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .sticker{font-size:32px;cursor:pointer;transition:transform 0.2s;-webkit-tap-highlight-color:transparent;}
+  .sticker:active{transform:scale(1.3);}
+  .hidden{display:none;}
+  .medal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .medal-card{border-radius:12px;padding:14px;text-align:center;}
+  .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+  .info-box{background:#E6F1FB;border-radius:12px;padding:14px;margin-top:14px;}
+  .info-box-title{font-size:13px;font-weight:700;color:#0C447C;margin-bottom:4px;}
+  .info-box-body{font-size:12px;color:#185FA5;line-height:1.6;}
+  @media(max-width:480px){
+    .cards-grid{grid-template-columns:repeat(2,1fr);}
+    .topbar-title{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Ayman 🚛</div>
+      <div class="topbar-sub">2 ans 1 mois → crèche septembre 2025</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px;color:#FFD4C0;margin-bottom:5px;font-weight:500;">Progression</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="global-bar" style="width:12%;"></div>
+      </div>
+      <div style="font-size:11px;color:#FFD4C0;margin-top:4px;font-weight:600;" id="global-pct">0%</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('learn')">📚 Apprendre</button>
+    <button class="nav-btn" onclick="showTab('quiz')">🎯 Quiz</button>
+    <button class="nav-btn" onclick="showTab('plan')">📅 Plan</button>
+    <button class="nav-btn" onclick="showTab('stars')">⭐ Étoiles</button>
+  </div>
+
+  <div class="content">
+
+    <!-- APPRENDRE -->
+    <div id="tab-learn">
+      <div class="month-badge">📅 Mai 2025 — 2 ans 1 mois</div>
+      <div class="score-row">
+        <div class="score-card" style="background:#EEEDFE;">
+          <div class="score-val" style="color:#3C3489;" id="done-count">0</div>
+          <div class="score-lbl" style="color:#534AB7;">acquis</div>
+        </div>
+        <div class="score-card" style="background:#FAECE7;">
+          <div class="score-val" style="color:#712B13;" id="total-count">20</div>
+          <div class="score-lbl" style="color:#993C1D;">objectifs</div>
+        </div>
+        <div class="score-card" style="background:#E1F5EE;">
+          <div class="score-val" style="color:#085041;" id="pct-count">0%</div>
+          <div class="score-lbl" style="color:#0F6E56;">ce mois</div>
+        </div>
+      </div>
+
+      <div class="section-head">🐘 Animaux — English + عربي</div>
+      <div class="cards-grid" id="animals-grid"></div>
+
+      <div class="section-head">🚛 Camions & véhicules</div>
+      <div class="cards-grid" id="trucks-grid"></div>
+
+      <div class="section-head">🌈 Couleurs — 3 langues</div>
+      <div class="cards-grid" id="colors-grid"></div>
+
+      <div class="section-head">🗣️ Phrases du quotidien</div>
+      <div class="cards-grid" id="phrases-grid"></div>
+
+      <div class="section-head">🔢 Chiffres — English + عربي</div>
+      <div class="cards-grid" id="numbers-grid"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="tab-quiz" class="hidden">
+      <div class="score-row">
+        <div class="score-card" style="background:#EAF3DE;">
+          <div class="score-val" style="color:#27500A;" id="q-score">0</div>
+          <div class="score-lbl" style="color:#3B6D11;">bonnes réponses</div>
+        </div>
+        <div class="score-card" style="background:#FAEEDA;">
+          <div class="score-val" style="color:#633806;" id="q-total">0</div>
+          <div class="score-lbl" style="color:#854F0B;">questions jouées</div>
+        </div>
+      </div>
+      <div class="quiz-area">
+        <div class="quiz-icon" id="q-icon">🐘</div>
+        <div class="quiz-q" id="q-text">Loading...</div>
+        <div class="quiz-options" id="q-opts"></div>
+        <div class="feedback" id="q-fb"></div>
+        <button class="next-btn" id="q-next" onclick="nextQuestion()">Question suivante ➜</button>
+      </div>
+    </div>
+
+    <!-- PLAN -->
+    <div id="tab-plan" class="hidden">
+      <div style="font-size:15px;font-weight:700;color:#2C2C2A;margin-bottom:14px;">Programme Mai → Septembre 2025</div>
+      <div class="timeline" id="timeline"></div>
+      <div class="info-box" style="margin-top:16px;">
+        <div class="info-box-title">💡 Conseil avant la crèche</div>
+        <div class="info-box-body">En août-septembre, pratiquez les routines : dire bonjour, au revoir, demander de l'aide, et exprimer ses besoins (faim, soif, pipi). Ces mots font toute la différence le premier jour !</div>
+      </div>
+      <div class="info-box" style="background:#EAF3DE;margin-top:10px;">
+        <div class="info-box-title" style="color:#27500A;">🚛 Astuces pour Ayman</div>
+        <div class="info-box-body" style="color:#3B6D11;">Utilisez ses camions préférés comme support : "The red fire truck / سيارة إطفاء حمراء". Jouez à nommer les couleurs des véhicules dans la rue — apprentissage naturel et amusant !</div>
+      </div>
+    </div>
+
+    <!-- ÉTOILES -->
+    <div id="tab-stars" class="hidden">
+      <div style="text-align:center;padding:20px 0 16px;">
+        <div style="font-size:48px;margin-bottom:6px;">⭐</div>
+        <div style="font-size:28px;font-weight:700;color:#2C2C2A;" id="star-count">0 étoiles</div>
+        <div style="font-size:13px;color:#888780;margin-top:6px;">Chaque bonne réponse = 1 étoile !</div>
+      </div>
+
+      <div style="font-size:15px;font-weight:700;color:#2C2C2A;margin-bottom:12px;">Médailles</div>
+      <div class="medal-grid">
+        <div class="medal-card" style="background:#FAEEDA;">
+          <div style="font-size:28px;">🥉</div>
+          <div style="font-size:13px;color:#633806;font-weight:700;margin-top:4px;">5 étoiles</div>
+          <div style="font-size:11px;color:#854F0B;margin-top:2px;" id="medal-bronze">0 / 5</div>
+        </div>
+        <div class="medal-card" style="background:#F1EFE8;">
+          <div style="font-size:28px;">🥈</div>
+          <div style="font-size:13px;color:#444441;font-weight:700;margin-top:4px;">15 étoiles</div>
+          <div style="font-size:11px;color:#5F5E5A;margin-top:2px;" id="medal-silver">0 / 15</div>
+        </div>
+        <div class="medal-card" style="background:#FAEEDA;">
+          <div style="font-size:28px;">🥇</div>
+          <div style="font-size:13px;color:#633806;font-weight:700;margin-top:4px;">30 étoiles</div>
+          <div style="font-size:11px;color:#854F0B;margin-top:2px;" id="medal-gold">0 / 30</div>
+        </div>
+        <div class="medal-card" style="background:#EEEDFE;">
+          <div style="font-size:28px;">🏆</div>
+          <div style="font-size:13px;color:#3C3489;font-weight:700;margin-top:4px;">50 étoiles</div>
+          <div style="font-size:11px;color:#534AB7;margin-top:2px;" id="medal-trophy">0 / 50</div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:16px;margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:10px;">Stickers d'Ayman</div>
+        <div class="sticker-row">
+          <span class="sticker">🐘</span>
+          <span class="sticker">🚛</span>
+          <span class="sticker">🦁</span>
+          <span class="sticker">🚜</span>
+          <span class="sticker">🦒</span>
+          <span class="sticker">🚒</span>
+          <span class="sticker">🐸</span>
+          <span class="sticker">🚑</span>
+          <span class="sticker">🐯</span>
+          <span class="sticker">🚌</span>
+          <span class="sticker">🦓</span>
+          <span class="sticker">🚂</span>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;border:1.5px solid #EDE8E0;padding:16px;margin-top:12px;">
+        <div style="font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:8px;">Suivi parents</div>
+        <div id="log-list" style="font-size:12px;color:#888780;line-height:2;">Aucune session enregistrée.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const animals=[
+  {icon:'🐘',label:'Elephant / فيل',done:false},
+  {icon:'🦁',label:'Lion / أسد',done:false},
+  {icon:'🐄',label:'Cow / بقرة',done:false},
+  {icon:'🐸',label:'Frog / ضفدع',done:false},
+  {icon:'🦒',label:'Giraffe / زرافة',done:false},
+  {icon:'🐟',label:'Fish / سمكة',done:false},
+  {icon:'🐯',label:'Tiger / نمر',done:false},
+  {icon:'🦓',label:'Zebra / حمار وحشي',done:false},
+];
+const trucks=[
+  {icon:'🚛',label:'Truck / شاحنة',done:false},
+  {icon:'🚜',label:'Tractor / جرار',done:false},
+  {icon:'🚒',label:'Fire truck / سيارة إطفاء',done:false},
+  {icon:'🚑',label:'Ambulance / إسعاف',done:false},
+  {icon:'🚌',label:'Bus / حافلة',done:false},
+  {icon:'🚂',label:'Train / قطار',done:false},
+];
+const colors=[
+  {icon:'🔴',label:'Red / أحمر / Rojo',done:false},
+  {icon:'🔵',label:'Blue / أزرق / Azul',done:false},
+  {icon:'🟢',label:'Green / أخضر / Verde',done:false},
+  {icon:'🟡',label:'Yellow / أصفر / Amarillo',done:false},
+  {icon:'🟠',label:'Orange / برتقالي / Naranja',done:false},
+  {icon:'🟣',label:'Purple / بنفسجي / Morado',done:false},
+];
+const phrases=[
+  {icon:'👋',label:'Hello / مرحبا / Hola',done:false},
+  {icon:'🙏',label:'Please / من فضلك / Por favor',done:false},
+  {icon:'😋',label:'I am hungry / أنا جائع',done:false},
+  {icon:'😴',label:'I am sleepy / أنا نعسان',done:false},
+  {icon:'💧',label:'I am thirsty / أنا عطشان',done:false},
+  {icon:'🚿',label:'Bathroom / الحمام',done:false},
+];
+const numbers=[
+  {icon:'1️⃣',label:'One / واحد / Uno',done:false},
+  {icon:'2️⃣',label:'Two / اثنان / Dos',done:false},
+  {icon:'3️⃣',label:'Three / ثلاثة / Tres',done:false},
+  {icon:'4️⃣',label:'Four / أربعة / Cuatro',done:false},
+  {icon:'5️⃣',label:'Five / خمسة / Cinco',done:false},
+  {icon:'6️⃣',label:'Six / ستة / Seis',done:false},
+  {icon:'7️⃣',label:'Seven / سبعة / Siete',done:false},
+  {icon:'8️⃣',label:'Eight / ثمانية / Ocho',done:false},
+  {icon:'9️⃣',label:'Nine / تسعة / Nueve',done:false},
+  {icon:'🔟',label:'Ten / عشرة / Diez',done:false},
+];
+
+const quizData=[
+  {icon:'🐘',q:'What is this animal?',opts:['Elephant','Lion','Cow','Giraffe'],ans:'Elephant'},
+  {icon:'🚛',q:'What vehicle is this?',opts:['Bus','Train','Truck','Car'],ans:'Truck'},
+  {icon:'🔴',q:'What color is this? 🔴',opts:['Blue','Red','Green','Yellow'],ans:'Red'},
+  {icon:'🦁',q:'This animal says ROAR! It\'s a...',opts:['Elephant','Giraffe','Lion','Frog'],ans:'Lion'},
+  {icon:'🚒',q:'This red truck helps in fires!',opts:['Ambulance','Tractor','Fire truck','Bus'],ans:'Fire truck'},
+  {icon:'🟡',q:'What color is the sun? 🌞',opts:['Red','Blue','Yellow','Green'],ans:'Yellow'},
+  {icon:'🐸',q:'This small green animal jumps!',opts:['Fish','Cow','Giraffe','Frog'],ans:'Frog'},
+  {icon:'🚜',q:'Farmers use this on fields.',opts:['Fire truck','Tractor','Ambulance','Train'],ans:'Tractor'},
+  {icon:'🦒',q:'Very long neck! It\'s a...',opts:['Elephant','Giraffe','Lion','Cow'],ans:'Giraffe'},
+  {icon:'🔵',q:'What color is the sea? 🌊',opts:['Red','Yellow','Green','Blue'],ans:'Blue'},
+  {icon:'🚑',q:'This white truck helps sick people!',opts:['Bus','Fire truck','Ambulance','Tractor'],ans:'Ambulance'},
+  {icon:'🟢',q:'What color is grass? 🌿',opts:['Red','Yellow','Green','Blue'],ans:'Green'},
+  {icon:'🐯',q:'This striped animal is a...',opts:['Lion','Zebra','Tiger','Cow'],ans:'Tiger'},
+  {icon:'🦓',q:'Black and white stripes — it\'s a...',opts:['Tiger','Zebra','Horse','Giraffe'],ans:'Zebra'},
+  {icon:'🚌',q:'This vehicle carries many people!',opts:['Truck','Bus','Train','Tractor'],ans:'Bus'},
+];
+
+const plan=[
+  {month:'Mai 2025',icon:'🐘',status:'active',title:'Animaux + couleurs de base',tags:['elephant','lion','cow','frog','red','blue','green','yellow']},
+  {month:'Juin 2025',icon:'🚛',status:'future',title:'Camions & véhicules',tags:['truck','tractor','fire truck','ambulance','bus','train']},
+  {month:'Juillet 2025',icon:'🗣️',status:'future',title:'Phrases du quotidien',tags:['hello','please','I want...','hungry','thirsty','bathroom']},
+  {month:'Août 2025',icon:'🔢',status:'future',title:'Chiffres 1-10 + formes',tags:['one→ten','circle','square','triangle','big/small']},
+  {month:'Septembre 2025',icon:'🎒',status:'future',title:'Prêt pour la crèche !',tags:['bonjour','au revoir','mon nom est...','j\'ai besoin d\'aide','merci']},
+];
+
+let stars=0;
+let qIdx=0;
+let qScore=0;
+let qTotal=0;
+let answered=false;
+let sessionLog=[];
+
+function saveState(){
+  const state={animals,trucks,colors,phrases,numbers,stars,qScore,qTotal};
+  try{localStorage.setItem('ayman_state',JSON.stringify(state));}catch(e){}
+}
+
+function loadState(){
+  try{
+    const s=localStorage.getItem('ayman_state');
+    if(!s) return;
+    const d=JSON.parse(s);
+    if(d.animals) d.animals.forEach((x,i)=>{if(animals[i]) animals[i].done=x.done;});
+    if(d.trucks) d.trucks.forEach((x,i)=>{if(trucks[i]) trucks[i].done=x.done;});
+    if(d.colors) d.colors.forEach((x,i)=>{if(colors[i]) colors[i].done=x.done;});
+    if(d.phrases) d.phrases.forEach((x,i)=>{if(phrases[i]) phrases[i].done=x.done;});
+    if(d.numbers) d.numbers.forEach((x,i)=>{if(numbers[i]) numbers[i].done=x.done;});
+    if(d.stars) stars=d.stars;
+    if(d.qScore) qScore=d.qScore;
+    if(d.qTotal) qTotal=d.qTotal;
+  }catch(e){}
+}
+
+function renderGrid(items,containerId){
+  const g=document.getElementById(containerId);
+  if(!g) return;
+  g.innerHTML='';
+  items.forEach((item)=>{
+    const d=document.createElement('div');
+    d.className='learn-card'+(item.done?' done':'');
+    d.innerHTML='<div class="icon">'+item.icon+'</div><div class="label">'+item.label+'</div>'+(item.done?'<div class="check">✓ Acquis !</div>':'<div class="sub">Appuyer pour valider</div>');
+    d.onclick=()=>{
+      item.done=!item.done;
+      if(item.done){
+        stars++;
+        logSession(item.label);
+      } else {
+        if(stars>0) stars--;
+      }
+      updateStars();
+      renderGrid(items,containerId);
+      updateProgress();
+      saveState();
+      if(item.done) animateStar(d);
+    };
+    g.appendChild(d);
+  });
+}
+
+function animateStar(el){
+  const s=document.createElement('div');
+  s.textContent='⭐';
+  s.style.cssText='position:absolute;font-size:24px;pointer-events:none;z-index:100;transition:all 0.6s;';
+  const r=el.getBoundingClientRect();
+  s.style.left=(r.left+r.width/2)+'px';
+  s.style.top=(r.top)+'px';
+  document.body.appendChild(s);
+  setTimeout(()=>{s.style.transform='translateY(-60px)';s.style.opacity='0';},50);
+  setTimeout(()=>{if(s.parentNode) s.parentNode.removeChild(s);},700);
+}
+
+function logSession(label){
+  const now=new Date();
+  const time=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  sessionLog.unshift(time+' — ✅ '+label);
+  if(sessionLog.length>10) sessionLog.pop();
+  const el=document.getElementById('log-list');
+  if(el) el.innerHTML=sessionLog.map(l=>'<div>'+l+'</div>').join('');
+}
+
+function updateProgress(){
+  const all=[...animals,...trucks,...colors,...phrases,...numbers];
+  const done=all.filter(x=>x.done).length;
+  const total=all.length;
+  document.getElementById('done-count').textContent=done;
+  document.getElementById('total-count').textContent=total;
+  const pct=Math.round(done/total*100);
+  document.getElementById('pct-count').textContent=pct+'%';
+  document.getElementById('global-bar').style.width=Math.max(3,pct)+'%';
+  document.getElementById('global-pct').textContent=pct+'%';
+}
+
+function updateStars(){
+  const sc=document.getElementById('star-count');
+  if(sc) sc.textContent=stars+' étoile'+(stars!==1?'s':'');
+  const qs=document.getElementById('q-score');
+  if(qs) qs.textContent=qScore;
+  const qt=document.getElementById('q-total');
+  if(qt) qt.textContent=qTotal;
+  const targets=[5,15,30,50];
+  ['bronze','silver','gold','trophy'].forEach((m,i)=>{
+    const el=document.getElementById('medal-'+m);
+    if(el) el.textContent=Math.min(stars,targets[i])+' / '+targets[i];
+  });
+}
+
+function renderTimeline(){
+  const tl=document.getElementById('timeline');
+  if(!tl) return;
+  tl.innerHTML='';
+  plan.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='tl-item';
+    div.innerHTML='<div class="tl-dot '+p.status+'">'+p.icon+'</div><div class="tl-body"><div class="tl-month">'+p.month+(p.status==='active'?' — EN COURS ✨':'')+'</div><div class="tl-title">'+p.title+'</div><div class="tl-tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div></div>';
+    tl.appendChild(div);
+  });
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function renderQuiz(){
+  const q=quizData[qIdx%quizData.length];
+  document.getElementById('q-icon').textContent=q.icon;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-fb').textContent='';
+  document.getElementById('q-fb').className='feedback';
+  answered=false;
+  const opts=document.getElementById('q-opts');
+  opts.innerHTML='';
+  const shuffled=[...q.opts];
+  shuffle(shuffled);
+  shuffled.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';
+    b.textContent=o;
+    b.onclick=()=>checkAnswer(o,q.ans);
+    opts.appendChild(b);
+  });
+}
+
+function checkAnswer(chosen,correct){
+  if(answered) return;
+  answered=true;
+  qTotal++;
+  const btns=document.querySelectorAll('.opt-btn');
+  btns.forEach(b=>{
+    if(b.textContent===correct) b.className='opt-btn correct';
+    else if(b.textContent===chosen && chosen!==correct) b.className='opt-btn wrong';
+  });
+  const fb=document.getElementById('q-fb');
+  if(chosen===correct){
+    qScore++;
+    stars++;
+    fb.textContent='Bravo Ayman ! Correct ! ⭐';
+    fb.className='feedback ok';
+    updateStars();
+    saveState();
+  } else {
+    fb.textContent='Presque ! La bonne réponse : '+correct+' 💪';
+    fb.className='feedback ko';
+  }
+}
+
+function nextQuestion(){
+  qIdx=(qIdx+1)%quizData.length;
+  if(qIdx===0) shuffle(quizData);
+  renderQuiz();
+}
+
+function showTab(name){
+  ['learn','quiz','plan','stars'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.add('hidden');
+  });
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    const tabs=['learn','quiz','plan','stars'];
+    b.className='nav-btn'+(tabs[i]===name?' active':'');
+  });
+}
+
+loadState();
+renderGrid(animals,'animals-grid');
+renderGrid(trucks,'trucks-grid');
+renderGrid(colors,'colors-grid');
+renderGrid(phrases,'phrases-grid');
+renderGrid(numbers,'numbers-grid');
+renderTimeline();
+shuffle(quizData);
+renderQuiz();
+updateProgress();
+updateStars();
+</script>
+</body>
+</html>
