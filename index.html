@@ -125,6 +125,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .popup-sub{font-size:15px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
 .popup-btn{background:var(--orange);color:#fff;border:none;border-radius:16px;padding:16px 30px;font-size:18px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 4px 14px rgba(255,107,53,0.35);}
 
+.reset-btn{display:block;width:100%;background:#FFF0EE;color:var(--red);border:2.5px solid #FFCCC5;border-radius:18px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;margin-top:14px;text-align:center;}
+.reset-btn:active{background:#FFE0DC;transform:scale(0.97);}
+
 .hidden{display:none!important;}
 </style>
 </head>
@@ -263,8 +266,8 @@ const MD=[
 let stars=0,qIdx=0,qScore=0,qTotal=0,qStreak=0,answered=false,curMonth='may26',activeTab='learn';
 let doneMap={},numDone={},alphaDone={},sessLog=[];
 
-function save(){try{localStorage.setItem('ay26d',JSON.stringify(doneMap));localStorage.setItem('ay26n',JSON.stringify(numDone));localStorage.setItem('ay26a',JSON.stringify(alphaDone));localStorage.setItem('ay26s',stars);localStorage.setItem('ay26qs',qScore);localStorage.setItem('ay26qt',qTotal);}catch(e){}}
-function load(){try{doneMap=JSON.parse(localStorage.getItem('ay26d')||'{}');numDone=JSON.parse(localStorage.getItem('ay26n')||'{}');alphaDone=JSON.parse(localStorage.getItem('ay26a')||'{}');stars=parseInt(localStorage.getItem('ay26s')||'0');qScore=parseInt(localStorage.getItem('ay26qs')||'0');qTotal=parseInt(localStorage.getItem('ay26qt')||'0');}catch(e){}}
+function save(){try{localStorage.setItem('ay26d',JSON.stringify(doneMap));localStorage.setItem('ay26n',JSON.stringify(numDone));localStorage.setItem('ay26a',JSON.stringify(alphaDone));localStorage.setItem('ay26s',stars);localStorage.setItem('ay26qs',qScore);localStorage.setItem('ay26qt',qTotal);localStorage.setItem('ay26qst',qStreak);localStorage.setItem('ay26log',JSON.stringify(sessLog));}catch(e){}}
+function load(){try{doneMap=JSON.parse(localStorage.getItem('ay26d')||'{}');numDone=JSON.parse(localStorage.getItem('ay26n')||'{}');alphaDone=JSON.parse(localStorage.getItem('ay26a')||'{}');stars=parseInt(localStorage.getItem('ay26s')||'0');qScore=parseInt(localStorage.getItem('ay26qs')||'0');qTotal=parseInt(localStorage.getItem('ay26qt')||'0');qStreak=parseInt(localStorage.getItem('ay26qst')||'0');sessLog=JSON.parse(localStorage.getItem('ay26log')||'[]');}catch(e){}}
 
 function mStats(m){let d=0,t=0;m.sections.forEach(s=>{if(s.type==='cards'){t+=s.items.length;s.items.forEach((_,i)=>{if(doneMap[m.id+'_'+s.id+'_'+i])d++;});}else if(s.type==='numbers'){const c=s.end-s.start+1;t+=c;for(let n=s.start;n<=s.end;n++){if(numDone[n])d++;}}else if(s.type==='alpha'){t+=26;'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{if(alphaDone[l])d++;});}});return{d,t};}
 function totalAll(){let d=0,t=0;MD.forEach(m=>{const s=mStats(m);d+=s.d;t+=s.t;});return{d,t};}
@@ -403,7 +406,18 @@ function renderStars(){
   sz.appendChild(sr);c.appendChild(sz);
   const lb=document.createElement('div');lb.className='log-box';lb.innerHTML='<div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">📋 Journal des parents</div><div id="log-list"></div>';c.appendChild(lb);
   const ll=document.getElementById('log-list');if(ll)ll.innerHTML=sessLog.length?sessLog.map(l=>'<div class="log-entry">'+l+'</div>').join(''):'<div class="log-entry">Aucune session enregistrée.</div>';
+  const rb=document.createElement('button');rb.className='reset-btn';rb.innerHTML='🔄 Recommencer depuis le début';rb.onclick=resetProgress;c.appendChild(rb);
   document.getElementById('scroll').scrollTop=0;
+}
+
+// ── RESET ──
+function resetProgress(){
+  if(!confirm('🔄 Remettre la progression à zéro ?\n\nLes cartes et étoiles seront réinitialisées.\nLe journal des sessions sera conservé.'))return;
+  const n=new Date();const t=n.toLocaleDateString('fr-FR')+' '+n.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  sessLog.unshift(t+' — 🔄 Remise à zéro par les parents');
+  doneMap={};numDone={};alphaDone={};stars=0;qScore=0;qTotal=0;qStreak=0;
+  save();updStars();renderMBar();renderStars();
+  showPopup('🔄','Remise à zéro !','La progression d\'Ayman repart de zéro 💪');
 }
 
 // ── TABS ──
