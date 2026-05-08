@@ -160,7 +160,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <span class="popup-icon" id="pi">🎉</span>
     <div class="popup-title" id="pt">Bravo !</div>
     <div class="popup-sub" id="ps">Super Ayman !</div>
-    <button class="popup-btn" onclick="closePopup()">Continuer ! ➜</button>
+    <button class="popup-btn" onclick="closePopup()" style="display:none">Continuer ! ➜</button>
   </div>
 </div>
 
@@ -300,7 +300,16 @@ function renderLearn(){
         const card=document.createElement('div');card.className='card'+(isDone?' done':'');
         const sub=item.ar+(item.es?' / '+item.es:'');
         card.innerHTML=`<span class="c-icon">${item.icon}</span><div class="c-label">${item.en}</div><div class="c-sub">${sub}</div>${isDone?'<div class="c-done">✓ Bravo !</div>':'<div class="c-tap">👆 Appuie ici !</div>'}`;
-        card.onclick=()=>{const was=!!doneMap[key];doneMap[key]=!was;if(!was){stars++;logSess(item.en);showPopup('⭐','Bravo Ayman !',item.icon+' '+item.en);}else if(stars>0)stars--;updStars();renderMBar();renderLearn();save();};
+        card.onclick=()=>{
+          const was=!!doneMap[key];doneMap[key]=!was;
+          if(!was){stars++;logSess(item.en);showPopup('⭐','Bravo Ayman !',item.icon+' '+item.en);}
+          else if(stars>0)stars--;
+          card.className='card'+(doneMap[key]?' done':'');
+          card.innerHTML=`<span class="c-icon">${item.icon}</span><div class="c-label">${item.en}</div><div class="c-sub">${sub}</div>${doneMap[key]?'<div class="c-done">✓ Bravo !</div>':'<div class="c-tap">👆 Appuie ici !</div>'}`;
+          card.onclick=arguments.callee;
+          h.querySelector('.section-pill').textContent=sec.items.filter((_,j)=>doneMap[m.id+'_'+sec.id+'_'+j]).length+'/'+sec.items.length;
+          updStars();renderMBar();save();
+        };
         g.appendChild(card);
       });c.appendChild(g);
     }
@@ -313,7 +322,17 @@ function renderLearn(){
         const card=document.createElement('div');card.className='num-card'+(isDone?' done':'');
         card.style.background=col+'1E';card.style.borderColor=isDone?'var(--green)':col;
         card.innerHTML=`<span class="nn" style="color:${col}">${n}</span><div class="nw" style="color:${col}">${NEN[n]}<br>${NAR[n]}</div>${isDone?'<div style="font-size:18px;color:var(--green);font-weight:900;margin-top:4px">✓</div>':''}`;
-        card.onclick=()=>{const was=!!numDone[n];numDone[n]=!was;if(!was){stars++;logSess(n+' '+NEN[n]);showPopup('🔢',n+' — '+NEN[n],''+NAR[n]);}else if(stars>0)stars--;updStars();renderMBar();renderLearn();save();};
+        card.onclick=()=>{
+          const was=!!numDone[n];numDone[n]=!was;
+          if(!was){stars++;logSess(n+' '+NEN[n]);showPopup('🔢',n+' — '+NEN[n],''+NAR[n]);}
+          else if(stars>0)stars--;
+          card.className='num-card'+(numDone[n]?' done':'');
+          card.style.borderColor=numDone[n]?'var(--green)':col;
+          card.innerHTML=`<span class="nn" style="color:${col}">${n}</span><div class="nw" style="color:${col}">${NEN[n]}<br>${NAR[n]}</div>${numDone[n]?'<div style="font-size:18px;color:var(--green);font-weight:900;margin-top:4px">✓</div>':''}`;
+          card.onclick=arguments.callee;
+          h.querySelector('.section-pill').textContent=[...Array(cnt)].filter((_,i)=>numDone[sec.start+i]).length+'/'+cnt;
+          updStars();renderMBar();save();
+        };
         g.appendChild(card);
       }c.appendChild(g);
     }
@@ -325,7 +344,16 @@ function renderLearn(){
         const isDone=!!alphaDone[l];
         const card=document.createElement('div');card.className='alpha-card'+(isDone?' done':'');
         card.innerHTML=`<span class="al">${l}</span><div class="aw">${AW[l]||l}</div>${isDone?'<div class="ac">✓</div>':''}`;
-        card.onclick=()=>{const was=!!alphaDone[l];alphaDone[l]=!was;if(!was){stars++;logSess('Letter '+l);showPopup('🔤','Lettre '+l+' !',AW[l]||'');}else if(stars>0)stars--;updStars();renderMBar();renderLearn();save();};
+        card.onclick=()=>{
+          const was=!!alphaDone[l];alphaDone[l]=!was;
+          if(!was){stars++;logSess('Letter '+l);showPopup('🔤','Lettre '+l+' !',AW[l]||'');}
+          else if(stars>0)stars--;
+          card.className='alpha-card'+(alphaDone[l]?' done':'');
+          card.innerHTML=`<span class="al">${l}</span><div class="aw">${AW[l]||l}</div>${alphaDone[l]?'<div class="ac">✓</div>':''}`;
+          card.onclick=arguments.callee;
+          h.querySelector('.section-pill').textContent='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(x=>alphaDone[x]).length+'/26';
+          updStars();renderMBar();save();
+        };
         g.appendChild(card);
       });c.appendChild(g);
     }
@@ -333,7 +361,7 @@ function renderLearn(){
   document.getElementById('scroll').scrollTop=0;
 }
 
-// ── QUIZ ──
+
 const QUIZ=[
   {icon:'🐘',q:'What animal is this?',opts:['Elephant','Lion','Cow','Giraffe'],ans:'Elephant'},
   {icon:'🚛',q:'What vehicle is this?',opts:['Bus','Train','Truck','Car'],ans:'Truck'},
